@@ -22,24 +22,86 @@
     <script>
         const canvas = document.getElementById("FirstCanvas");
         const ctx = canvas.getContext("2d");
+        const ballRadius = 10;
+        const paddleHeight = 10;
+        const paddleWidth = 75;
+        let paddleX = (canvas.width - paddleWidth) / 2;
 
-        ctx.beginPath();
-        ctx.rect(20, 40, 50, 50);
-        ctx.fillStyle = "#FF0000";
-        ctx.fill();
-        ctx.closePath();
+        let x = canvas.width / 2;
+        let y = canvas.height - 30;
 
-        ctx.beginPath();
-        ctx.arc(240, 160, 20, 0, Math.PI * 2, false);
-        ctx.fillStyle = "green";
-        ctx.fill();
-        ctx.closePath();
+        let dx = 2;
+        let dy = -2;
 
-        ctx.beginPath
-        ctx.rect(160, 10, 100, 40);
-        ctx.strokeStyle = "rgba(0, 0, 255, 0.5)";
-        ctx.stroke();
-        ctx.closePath();
+        let rightPressed = false;
+        let leftPressed = false;
+
+
+        function drawPaddle() {
+            ctx.beginPath();
+            ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+            ctx.fillStyle = "blue";
+            ctx.fill();
+            ctx.closePath();
+
+            if (rightPressed) {
+                paddleX = Math.min(paddleX + 7, canvas.width - paddleWidth);
+            } else if (leftPressed) {
+                paddleX = Math.max(paddleX - 7, 0);
+            }  
+        }
+
+        function drawBall() {
+            ctx.beginPath();
+            ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
+            ctx.fillStyle = "red";
+            ctx.fill();
+            ctx.closePath();
+
+            if (y + dy < ballRadius || y + dy > canvas.height - ballRadius) {
+                dy = -dy;
+            }
+
+            if (x + dx < ballRadius || x + dx > canvas.width - ballRadius) {
+                dx = -dx;
+            }
+
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBall();
+            drawPaddle();
+            x += dx;
+            y += dy;
+            drawPaddle();
+        }
+
+        function keyDownHandler(e) {
+            if (e.key === "Right" || e.key === "ArrowRight") {
+                rightPressed = true;
+            } else if (e.key === "Left" || e.key === "ArrowLeft") {
+                leftPressed = true;
+            }
+        }
+
+        function keyUpHandler(e) {
+            if (e.key === "Right" || e.key === "ArrowRight") {
+                rightPressed = false;
+            } else if (e.key === "Left" || e.key === "ArrowLeft") {
+                leftPressed = false;
+            }
+        }
+
+
+
+        document.addEventListener("keydown", keyDownHandler, false);
+        document.addEventListener("keyup", keyUpHandler, false);
+
+        setInterval(draw, 10);
+
+        
+
     </script>
     
 </body>
