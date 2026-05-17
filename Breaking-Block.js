@@ -1,20 +1,46 @@
         const canvas = document.getElementById("FirstCanvas");
         const ctx = canvas.getContext("2d");
-        const ballRadius = 10;
-        const paddleHeight = 10;
-        const paddleWidth = 75;
+        const ballRadius = 10;  // ボールの半径
+        const paddleHeight = 10; // パドルの高さ
+        const paddleWidth = 75; // パドルの幅
+        
+
         let paddleX = (canvas.width - paddleWidth) / 2;
         let score = 0;
-
-        let x = canvas.width / 2;
+        let x = canvas.width / 2; 
         let y = canvas.height - 30;
-
         let dx = 2;
         let dy = -2;
-
         let rightPressed = false;
         let leftPressed = false;
         
+        function circleRectCollision(circleX, circleY, radius, rectX, rectY, rectWidth, rectHeight) {
+
+            // 最近点を求める
+            const closestX = Math.max(
+                rectX,
+                Math.min(circleX, rectX + rectWidth)
+            );
+
+            const closestY = Math.max(
+                rectY,
+                Math.min(circleY, rectY + rectHeight)
+            );
+
+            // 円中心との距離
+            const distanceX = circleX - closestX;
+            const distanceY = circleY - closestY;
+
+            // 距離の二乗
+            const distanceSquared =
+                distanceX * distanceX +
+                distanceY * distanceY;
+
+            // 半径と比較
+            return distanceSquared < radius * radius;
+        }
+
+
         function drawPaddle() {
             ctx.beginPath();
             ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
@@ -35,23 +61,25 @@
             ctx.fillStyle = "red";
             ctx.fill();
             ctx.closePath();
+        }
 
-
+        function updateBall() {
+            // 壁に当たった時
             if (y + dy < ballRadius ) {
                 dy = -dy;
-            } else if (y + dy > canvas.height - ballRadius) {
-                if (x > paddleX && x < paddleX + paddleWidth) {
-                    dy = -dy;
-                } else {
-                    alert("GAME OVER");
-                    document.location.reload();
-                }
+            } else if (y > canvas.height + ballRadius && dy > 0) {
+                alert("GAME OVER");
+                document.location.reload();
+                clearInterval(interval);
             }
-
             if (x + dx < ballRadius || x + dx > canvas.width - ballRadius) {
                 dx = -dx;
             }
 
+            //パドルに当たった時
+            if (circleRectCollision(x, y, ballRadius, paddleX, canvas.height - paddleHeight, paddleWidth, canvas.height)) {
+                dy = -dy;
+            }
         }
 
         function drawScore() {
@@ -63,6 +91,7 @@
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawBall();
+            updateBall();
             drawPaddle();
             x += dx;
             y += dy;
@@ -143,7 +172,7 @@
                 for (let r = 0; r < brickRowCount; r++) {
                     const b = bricks[c][r];
                     if (b.status === 1) {
-                        if (x > b.x && x < b.x + brickWidth && y > b.y && y < b.y + brickHeight) {
+                        if (x + ballRadius > b.x && x - ballRadius < b.x + brickWidth && y + ballRadius > b.y && y - ballRadius < b.y + brickHeight) {
                             dy = -dy;
                             b.status = 0;
                             score++;
@@ -160,4 +189,4 @@
         document.addEventListener("keydown", keyDownHandler, false);
         document.addEventListener("keyup", keyUpHandler, false);
 
-        draw();
+        onload = draw;
