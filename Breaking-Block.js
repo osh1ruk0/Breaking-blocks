@@ -2,7 +2,7 @@
         const ctx = canvas.getContext("2d");
         const ballRadius = 10;  // ボールの半径
         const paddleHeight = 10; // パドルの高さ
-        const paddleWidth = 75; // パドルの幅
+        const paddleWidth = 80; // パドルの幅
         
 
         let paddleX = (canvas.width - paddleWidth) / 2;
@@ -77,8 +77,9 @@
             }
 
             //パドルに当たった時
-            if (circleRectCollision(x, y, ballRadius, paddleX, canvas.height - paddleHeight, paddleWidth, canvas.height)) {
-                dy = -dy;
+            if (circleRectCollision(x, y, ballRadius, paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight)) {
+                dx = (10 * (x - (paddleX + paddleWidth / 2))) / paddleWidth; 
+                dy = -Math.abs(dy);
             }
         }
 
@@ -172,7 +173,7 @@
                 for (let r = 0; r < brickRowCount; r++) {
                     const b = bricks[c][r];
                     if (b.status === 1) {
-                        if (x + ballRadius > b.x && x - ballRadius < b.x + brickWidth && y + ballRadius > b.y && y - ballRadius < b.y + brickHeight) {
+                        if (circleRectCollision(x, y, ballRadius, b.x, b.y, brickWidth, brickHeight)) {
                             dy = -dy;
                             b.status = 0;
                             score++;
