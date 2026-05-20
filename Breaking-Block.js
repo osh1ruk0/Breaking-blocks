@@ -78,7 +78,7 @@
 
             //パドルに当たった時
             if (circleRectCollision(x, y, ballRadius, paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight)) {
-                dx = (10 * (x - (paddleX + paddleWidth / 2))) / paddleWidth; 
+                dx = (20 * (x - (paddleX + paddleWidth / 2))) / paddleWidth; 
                 dy = -Math.abs(dy);
             }
         }
@@ -174,7 +174,14 @@
                     const b = bricks[c][r];
                     if (b.status === 1) {
                         if (circleRectCollision(x, y, ballRadius, b.x, b.y, brickWidth, brickHeight)) {
-                            dy = -dy;
+                            const previousX = x - dx;
+                            const previousY = y - dy;
+                            if (previousY + ballRadius <= b.y || previousY -ballRadius >= b.y + brickHeight){
+                                dy = -dy;
+                            }else{
+                                dx = -dx;
+                            }
+
                             b.status = 0;
                             score++;
                             if (score === brickRowCount * brickColumnCount) {
